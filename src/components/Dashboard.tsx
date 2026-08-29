@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { Game } from "../types";
 import SidebarIcon from "./SidebarIcon";
 import lapinTuto from "../../assets/lapin_tuto.png";
@@ -10,90 +11,186 @@ interface DashboardProps {
   onOpenTutorial: () => void;
 }
 
-export default function Dashboard({ games, onOpenGame, onLaunchGame, onGoToLibrary, onOpenTutorial }: DashboardProps) {
-  const recent = [...games]
-    .filter((g) => g.last_played)
-    .sort((a, b) => (b.last_played! > a.last_played! ? 1 : -1));
+function GameTile({
+  game,
+  selected,
+  onClick,
+}: {
+  game: Game;
+  selected?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`xbox-game-tile ${selected ? "is-selected" : ""}`}
+      style={
+        game.cover_image
+          ? { backgroundImage: `url(${game.cover_image})` }
+          : undefined
+      }
+      title={game.name}
+    >
+      {!game.cover_image && <span className="xbox-game-letter">{game.name.charAt(0).toUpperCase()}</span>}
+      <span className="xbox-game-shade" />
+      <span className="xbox-game-name">{game.name}</span>
+    </button>
+  );
+}
 
-  const lastPlayed = recent[0];
+export default function Dashboard({
+  games,
+  onOpenGame,
+  onLaunchGame,
+  onGoToLibrary,
+  onOpenTutorial,
+}: DashboardProps) {
+  const recent = useMemo(
+    () =>
+      [...games]
+        .filter((g) => g.last_played)
+        .sort((a, b) => (b.last_played! > a.last_played! ? 1 : -1)),
+    [games],
+  );
+
+  const featured = recent[0] ?? games[0];
+  const [focusedId, setFocusedId] = useState(featured?.id ?? null);
+  const focusedGame = games.find((g) => g.id === focusedId) ?? featured;
+  const rowGames = games.slice(0, 10);
+  const lastPlayed = recent.slice(0, 8);
 
   return (
-      <div className="page-enter p-8 space-y-8">
-        <div className="flex items-start justify-between gap-4">
-          <div className="space-y-1">
-            <p className="nyro-section-title">Accueil</p>
-            <h1 className="text-2xl font-semibold">Bonjour.</h1>
-            <p className="text-nexus-muted text-sm">Voici ton environnement gaming, en un coup d'œil.</p>
+    <div className="xbox-home page-enter">
+      <div
+        className="xbox-backdrop"
+        style={
+          focusedGame?.cover_image
+            ? { backgroundImage: `url(${focusedGame.cover_image})` }
+            : undefined
+        }
+      />
+      <div className="xbox-backdrop-overlay" />
+
+      <header className="xbox-topbar">
+        <div className="xbox-profile">
+          <div className="xbox-avatar">{featured ? featured.name.charAt(0).toUpperCase() : "N"}</div>
+          <div>
+            <div className="xbox-gamertag">Nyro Player</div>
+            <div className="xbox-status"><span /> EN LIGNE</div>
           </div>
-          <button
-            data-tutorial-id="tutorial-open-rabbit"
-            onClick={onOpenTutorial}
-            className="tutorial-rabbit-btn"
-            title="Ouvrir le tutoriel"
-          >
-            <SidebarIcon src={lapinTuto} alt="Tutoriel" removeGreenScreen className="w-11 h-11 object-contain" />
-          </button>
         </div>
 
-      {lastPlayed ? (
-        <section className="nyro-panel p-6 flex items-center justify-between gap-4">
-          <div>
-            <p className="nyro-section-title mb-2">Continuer</p>
-            <h2 className="text-lg font-medium">{lastPlayed.name}</h2>
-            <p className="text-xs text-nexus-muted mt-1">
-              Dernière session : {new Date(lastPlayed.last_played!).toLocaleString("fr-FR")}
-            </p>
-          </div>
-          <button
-            onClick={() => onLaunchGame(lastPlayed.id)}
-            className="nyro-btn-strong px-5 py-2 text-sm font-medium"
-          >
-            ▶ JOUER
-          </button>
-        </section>
-      ) : (
-        <section className="nyro-panel p-5 text-nexus-muted text-sm">
-          Aucun jeu lancé pour l'instant.{" "}
-          <button onClick={onGoToLibrary} className="text-nexus-accent hover:text-nexus-text transition-colors">
-            Ajoute ton premier jeu
-          </button>
-          .
-        </section>
-      )}
+        <nav className="xbox-quick-nav" aria-label="Navigation rapide">
+          <button onClick={onGoToLibrary} title="Ma bibliothèque">▦</button>
+          <button onClick={onGoToLibrary} title="Jeux">⌁</button>
+          <button onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: " ", code: "Space", ctrlKey: true }))} title="Recherche">⌕</button>
+          <button onClick={onOpenTutorial} title="Aide">?</button>
+        </nav>
 
-      <section data-tutorial-id="tutorial-recent-games">
-        <p className="nyro-section-title mb-3">Récemment ajoutés</p>
-        {games.length === 0 ? (
-          <p className="text-sm text-nexus-muted">Ta bibliothèque est vide.</p>
+        <div className="xbox-clock">
+          <span>NYRO</span>
+          <strong>{new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date())}</strong>
+        </div>
+      </header>
+
+      <div className="xbox-content">
+        {focusedGame ? (
+          <section className="xbox-featured">
+            <div className="xbox-featured-copy">
+              <p className="xbox-kicker">CONTINUER À JOUER</p>
+              <h1>{focusedGame.name}</h1>
+              <p className="xbox-featured-meta">
+                {focusedGame.category || "Bibliothèque Nyro"}
+                {focusedGame.last_played
+                  ? ` · Dernière session le ${new Date(focusedGame.last_played).toLocaleDateString("fr-FR")}`
+                  : ""}
+              </p>
+              <div className="xbox-featured-actions">
+                <button className="xbox-play" onClick={() => onLaunchGame(focusedGame.id)}>
+                  <span>▶</span> JOUER
+                </button>
+                <button className="xbox-secondary" onClick={() => onOpenGame(focusedGame.id)}>
+                  VOIR LE JEU
+                </button>
+              </div>
+            </div>
+          </section>
         ) : (
-          <div className="grid grid-cols-4 md:grid-cols-8 gap-3">
-            {games.slice(0, 8).map((g) => (
-              <button
-                key={g.id}
-                onClick={() => onOpenGame(g.id)}
-                style={
-                  g.cover_image
-                    ? {
-                        backgroundImage: `linear-gradient(to top, rgba(11,15,20,0.92) 0%, rgba(11,15,20,0.22) 58%, rgba(11,15,20,0.02) 100%), url(${g.cover_image})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                      }
-                    : { backgroundColor: "var(--nexus-panel2)" }
-                }
-                className="nyro-card-hover relative aspect-[2/3] rounded-lg border border-nexus-border overflow-hidden text-left flex flex-col justify-end p-3"
-              >
-                {!g.cover_image && (
-                  <span className="absolute inset-0 flex items-center justify-center text-3xl font-semibold text-nexus-muted/30">
-                    {g.name.charAt(0).toUpperCase()}
-                  </span>
-                )}
-                <p className="text-xs font-medium truncate relative z-10">{g.name}</p>
-                <p className="text-[10px] text-nexus-muted truncate relative z-10">{g.category || "—"}</p>
-              </button>
-            ))}
-          </div>
+          <section className="xbox-empty-featured">
+            <p className="xbox-kicker">BIENVENUE SUR NYRO</p>
+            <h1>Ta bibliothèque, ton espace.</h1>
+            <p>Ajoute tes jeux pour créer un accueil vivant et personnalisé.</p>
+            <button className="xbox-play" onClick={onGoToLibrary}>AJOUTER DES JEUX</button>
+          </section>
         )}
-      </section>
+
+        <section className="xbox-section">
+          <div className="xbox-section-heading">
+            <div>
+              <p className="xbox-kicker">ACCÈS RAPIDE</p>
+              <h2>Mes jeux</h2>
+            </div>
+            <button onClick={onGoToLibrary}>TOUT AFFICHER →</button>
+          </div>
+
+          {rowGames.length > 0 ? (
+            <div className="xbox-game-row">
+              {rowGames.map((game) => (
+                <GameTile
+                  key={game.id}
+                  game={game}
+                  selected={focusedGame?.id === game.id}
+                  onClick={() => {
+                    setFocusedId(game.id);
+                    onOpenGame(game.id);
+                  }}
+                />
+              ))}
+              <button className="xbox-all-games" onClick={onGoToLibrary}>
+                <span>+</span>
+                <small>BIBLIOTHÈQUE</small>
+              </button>
+            </div>
+          ) : (
+            <div className="xbox-empty-row">Ta bibliothèque est encore vide.</div>
+          )}
+        </section>
+
+        <section className="xbox-section">
+          <div className="xbox-section-heading">
+            <div>
+              <p className="xbox-kicker">TON ESPACE</p>
+              <h2>À la une</h2>
+            </div>
+          </div>
+
+          <div className="xbox-feature-grid">
+            <button className="xbox-feature-card xbox-feature-library" onClick={onGoToLibrary}>
+              <div>
+                <span className="xbox-card-icon">▦</span>
+                <p>PARCOURIR</p>
+                <strong>Ta bibliothèque</strong>
+              </div>
+            </button>
+            <button className="xbox-feature-card xbox-feature-recent" onClick={() => focusedGame && onOpenGame(focusedGame.id)}>
+              <div>
+                <span className="xbox-card-icon">◷</span>
+                <p>REPRENDRE</p>
+                <strong>{lastPlayed[0]?.name ?? "Ton prochain jeu"}</strong>
+              </div>
+            </button>
+            <button className="xbox-feature-card xbox-feature-tutorial" onClick={onOpenTutorial}>
+              <div className="xbox-tutorial-card-content">
+                <SidebarIcon src={lapinTuto} alt="" removeGreenScreen className="w-14 h-14 object-contain" />
+                <div>
+                  <p>BIENVENUE</p>
+                  <strong>Personnalise Nyro</strong>
+                </div>
+              </div>
+            </button>
+          </div>
+        </section>
       </div>
+    </div>
   );
 }
