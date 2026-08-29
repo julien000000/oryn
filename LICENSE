@@ -1,0 +1,28 @@
+Copyright (c) 2026 bartokaa. Tous droits réservés.
+
+Ce dépôt contient le code source de Nyro. Le code est rendu public à des fins
+de transparence, mais n'est pas distribué sous licence open source.
+
+CE QUI EST AUTORISÉ :
+- Télécharger et utiliser gratuitement l'application Nyro compilée
+  (installateur officiel distribué via les Releases GitHub de ce dépôt).
+- Consulter le code source de ce dépôt à des fins d'apprentissage ou de
+  vérification de ce que fait le logiciel.
+- Signaler des bugs et proposer des suggestions via les Issues du dépôt.
+
+CE QUI N'EST PAS AUTORISÉ SANS PERMISSION ÉCRITE DE L'AUTEUR :
+- Copier, modifier, redistribuer ou publier tout ou partie de ce code source.
+- Compiler et distribuer une version modifiée ou non de ce logiciel.
+- Utiliser ce code, en tout ou partie, dans un autre projet, commercial ou non.
+- Revendre, sous-licencier ou redistribuer l'application sous quelque forme
+  que ce soit.
+
+Toute utilisation non autorisée de ce code source constitue une violation
+du droit d'auteur.
+
+Pour toute demande d'autorisation ou question concernant l'utilisation de ce
+code, contacter l'auteur via GitHub : https://github.com/bartokaa
+
+CE LOGICIEL EST FOURNI "TEL QUEL", SANS GARANTIE D'AUCUNE SORTE, EXPRESSE OU
+IMPLICITE. EN AUCUN CAS L'AUTEUR NE POURRA ÊTRE TENU RESPONSABLE DE TOUT
+DOMMAGE RÉSULTANT DE L'UTILISATION DE CE LOGICIEL.

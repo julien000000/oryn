@@ -1,0 +1,271 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme="dark"] {
+  --nexus-bg: #070a0f;
+  --nexus-panel: #0f141c;
+  --nexus-panel2: #151c26;
+  --nexus-border: #223043;
+  --nexus-text: #e7edf7;
+  --nexus-muted: #8291a5;
+  --nexus-accent: #2d64d6;
+  --nexus-accent2: #4a8dff;
+  --nexus-danger: #d85f5f;
+  --nexus-success: #35b67e;
+}
+
+[data-theme="light"] {
+  --nexus-bg: #f4f5f7;
+  --nexus-panel: #ffffff;
+  --nexus-panel2: #eceef2;
+  --nexus-border: #dcdfe4;
+  --nexus-text: #14161a;
+  --nexus-muted: #62666f;
+  --nexus-accent: #6c5ce7;
+  --nexus-accent2: #0090b0;
+  --nexus-danger: #d63c3c;
+  --nexus-success: #1f9d6e;
+}
+
+[data-theme="midnight"] {
+  --nexus-bg: #04070c;
+  --nexus-panel: #0a0f16;
+  --nexus-panel2: #101722;
+  --nexus-border: #1b2738;
+  --nexus-text: #dfe8f4;
+  --nexus-muted: #718197;
+  --nexus-accent: #2558bf;
+  --nexus-accent2: #3f7ff1;
+  --nexus-danger: #d85f5f;
+  --nexus-success: #35b67e;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--nexus-border) transparent;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Inter", system-ui, sans-serif;
+  user-select: none;
+  background-color: var(--nexus-bg);
+  color: var(--nexus-text);
+}
+
+#root {
+  height: 100vh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+input,
+select,
+textarea {
+  color: var(--nexus-text);
+}
+
+::placeholder {
+  color: var(--nexus-muted);
+}
+
+.nyro-shell {
+  background:
+    radial-gradient(circle at top, rgba(45, 100, 214, 0.12), transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0)),
+    var(--nexus-bg);
+}
+
+.nyro-sidebar {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)) , var(--nexus-panel);
+}
+
+.nyro-panel {
+  background-color: var(--nexus-panel);
+  border: 1px solid var(--nexus-border);
+  border-radius: 10px;
+}
+
+.nyro-panel-muted {
+  background-color: color-mix(in srgb, var(--nexus-panel2) 82%, black 18%);
+  border: 1px solid var(--nexus-border);
+  border-radius: 8px;
+}
+
+.nyro-input {
+  background-color: var(--nexus-panel2);
+  border: 1px solid var(--nexus-border);
+  border-radius: 8px;
+  color: var(--nexus-text);
+}
+
+.nyro-input:focus {
+  outline: none;
+  border-color: var(--nexus-accent);
+}
+
+.nyro-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--nexus-border);
+  background-color: var(--nexus-panel2);
+  color: var(--nexus-text);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.nyro-btn:hover {
+  border-color: color-mix(in srgb, var(--nexus-accent) 55%, var(--nexus-border));
+  background-color: color-mix(in srgb, var(--nexus-panel2) 90%, white 10%);
+}
+
+.nyro-btn:focus-visible,
+.nyro-btn-strong:focus-visible,
+.nyro-input:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--nexus-accent) 50%, transparent);
+  outline-offset: 1px;
+}
+
+.nyro-btn-strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--nexus-accent) 55%, var(--nexus-border));
+  background-color: color-mix(in srgb, var(--nexus-accent) 22%, var(--nexus-panel));
+  color: #f4f8ff;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.nyro-btn-strong:hover {
+  border-color: var(--nexus-accent);
+  background-color: color-mix(in srgb, var(--nexus-accent) 28%, var(--nexus-panel));
+}
+
+.nyro-section-title {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--nexus-muted);
+}
+
+.nyro-card-hover {
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+.nyro-card-hover:hover {
+  border-color: color-mix(in srgb, var(--nexus-accent) 45%, var(--nexus-border));
+  background-color: color-mix(in srgb, var(--nexus-panel) 92%, white 8%);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-enter {
+  animation: fadeIn 0.18s ease-out;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.toast-enter {
+  animation: toastIn 0.15s ease-out;
+}
+
+.reduce-motion .page-enter,
+.reduce-motion .toast-enter {
+  animation: none;
+}
+
+@keyframes heroZoom {
+  from { transform: scale(1.08); }
+  to { transform: scale(1); }
+}
+
+.hero-zoom {
+  animation: heroZoom 12s ease-out forwards;
+}
+
+@keyframes launchIndeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}
+
+.launch-indeterminate {
+  animation: launchIndeterminate 1.2s ease-in-out infinite;
+}
+
+.reduce-motion .hero-zoom,
+.reduce-motion .launch-indeterminate {
+  animation: none;
+}
+
+.tutorial-rabbit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--nexus-border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--nexus-panel2) 85%, white 15%);
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
+}
+
+.tutorial-rabbit-btn:hover {
+  border-color: color-mix(in srgb, var(--nexus-accent) 55%, var(--nexus-border));
+  background: color-mix(in srgb, var(--nexus-panel2) 78%, white 22%);
+}
+
+.update-banner {
+  background: color-mix(in srgb, var(--nexus-accent) 16%, var(--nexus-panel));
+  border-bottom: 1px solid color-mix(in srgb, var(--nexus-accent) 35%, var(--nexus-border));
+}
+
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  pointer-events: none;
+}
+
+.tutorial-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(3, 7, 12, 0.72);
+}
+
+.tutorial-highlight {
+  position: fixed;
+  border: 2px solid var(--nexus-accent2);
+  border-radius: 12px;
+  background: rgba(74, 141, 255, 0.08);
+  box-shadow: 0 0 0 9999px rgba(3, 7, 12, 0.66);
+  pointer-events: none;
+}
+
+.tutorial-bubble {
+  position: fixed;
+  width: min(340px, calc(100vw - 48px));
+  padding: 16px;
+  pointer-events: auto;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+}
