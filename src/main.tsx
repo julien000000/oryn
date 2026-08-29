@@ -4,10 +4,9 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import App from "./App";
 import MiniMode from "./MiniMode";
 import "./styles.css";
+import "./modern-ui.css";
 
-// Détection fiable : le nom de la fenêtre elle-même, pas un paramètre d'URL
-// (les query strings ne sont pas correctement supportées par WebviewUrl::App
-// côté Rust, ce qui causait une page blanche).
+// Détection fiable : le nom de la fenêtre elle-même, pas un paramètre d'URL.
 const isMini = getCurrentWindow().label === "mini";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
