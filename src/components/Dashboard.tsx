@@ -1,7 +1,5 @@
 import { useMemo, useState } from "react";
 import { Game } from "../types";
-import SidebarIcon from "./SidebarIcon";
-import lapinTuto from "../../assets/lapin_tuto.png";
 
 interface DashboardProps {
   games: Game[];
@@ -28,7 +26,6 @@ export default function Dashboard({ games, onOpenGame, onLaunchGame, onGoToLibra
   const [focusedId, setFocusedId] = useState(featured?.id ?? null);
   const focusedGame = games.find((g) => g.id === focusedId) ?? featured;
   const rowGames = games.slice(0, 10);
-  const lastPlayed = recent.slice(0, 8);
   const avatarIsImage = profile.avatar?.startsWith("data:image/");
 
   function openSearch() {
@@ -70,14 +67,6 @@ export default function Dashboard({ games, onOpenGame, onLaunchGame, onGoToLibra
 
         <section className="xbox-section"><div className="xbox-section-heading"><div><p className="xbox-kicker">RÉCEMMENT JOUÉS</p><h2>Ta collection</h2></div><button onClick={onGoToLibrary}>VOIR TOUT →</button></div>
           {rowGames.length > 0 ? <div className="xbox-game-row">{rowGames.map((game) => <GameTile key={game.id} game={game} selected={focusedGame?.id === game.id} onClick={() => { setFocusedId(game.id); onOpenGame(game.id); }} />)}<button className="xbox-all-games" onClick={onGoToLibrary}><span>+</span><small>BIBLIOTHÈQUE</small></button></div> : <div className="xbox-empty-row">Ta bibliothèque est encore vide.</div>}
-        </section>
-
-        <section className="xbox-section"><div className="xbox-section-heading"><div><p className="xbox-kicker">TON ESPACE</p><h2>Accès rapide</h2></div></div>
-          <div className="xbox-feature-grid">
-            <button className="xbox-feature-card xbox-feature-library" onClick={onGoToLibrary}><div><span className="xbox-card-icon">▦</span><p>PARCOURIR</p><strong>Bibliothèque</strong></div></button>
-            <button className="xbox-feature-card xbox-feature-recent" onClick={() => focusedGame && onOpenGame(focusedGame.id)}><div><span className="xbox-card-icon">◷</span><p>REPRENDRE</p><strong>{lastPlayed[0]?.name ?? "Ton prochain jeu"}</strong></div></button>
-            <button className="xbox-feature-card xbox-feature-tutorial" onClick={onOpenTutorial}><div className="xbox-tutorial-card-content"><SidebarIcon src={lapinTuto} alt="" removeGreenScreen className="w-14 h-14 object-contain" /><div><p>NYRO</p><strong>Personnaliser</strong></div></div></button>
-          </div>
         </section>
       </div>
     </div>
