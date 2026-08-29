@@ -15,12 +15,32 @@ import Settings from "./components/Settings";
 import Notifications from "./components/Notifications";
 import UpdateChecker from "./components/UpdateChecker";
 import TutorialOverlay from "./components/TutorialOverlay";
+import ProfileSetup from "./components/ProfileSetup";
 import { notify } from "./notify";
 import { AppConfig, View } from "./types";
+
+interface UserProfile {
+  name: string;
+  avatar: string | null;
+}
+
+const PROFILE_STORAGE_KEY = "oryn.user-profile";
+
+function loadProfile(): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+    if (!raw) return null;
+    const profile = JSON.parse(raw) as UserProfile;
+    return profile?.name?.trim() ? profile : null;
+  } catch {
+    return null;
+  }
+}
 
 export default function App() {
   const [view, setView] = useState<View>("home");
   const [collapsed, setCollapsed] = useState(false);
+  const [profile, setProfile] = useState<UserProfile | null>(loadProfile);
   const [config, setConfig] = useState<AppConfig>({
     games: [],
     favorites: [],
@@ -57,29 +77,20 @@ export default function App() {
     type PendingAction = { type: "AddGame" | "OpenFolder"; path: string } | null;
     function handlePendingAction(action: PendingAction) {
       if (!action) return;
-      if (action.type === "AddGame") {
-        setDroppedExePath(action.path);
-      } else if (action.type === "OpenFolder") {
+      if (action.type === "AddGame") setDroppedExePath(action.path);
+      else if (action.type === "OpenFolder") {
         setTargetFolder(action.path);
-        if (config.settings.developer_mode) {
-          setView("files");
-        }
+        if (config.settings.developer_mode) setView("files");
       }
     }
     invoke<PendingAction>("get_pending_action").then(handlePendingAction);
     const unlisten = listen<PendingAction>("pending-action", (e) => handlePendingAction(e.payload));
-    return () => {
-      unlisten.then((f) => f());
-    };
+    return () => { unlisten.then((f) => f()); };
   }, [config.settings.developer_mode]);
 
   useEffect(() => {
-    const unlisten = listen<string>("navigate", (event) => {
-      setView(event.payload as View);
-    });
-    return () => {
-      unlisten.then((f) => f());
-    };
+    const unlisten = listen<string>("navigate", (event) => setView(event.payload as View));
+    return () => { unlisten.then((f) => f()); };
   }, []);
 
   useEffect(() => {
@@ -87,24 +98,17 @@ export default function App() {
     const unlisten = webview.onDragDropEvent((event) => {
       if (event.payload.type === "drop") {
         const exePath = event.payload.paths.find((p) => p.toLowerCase().endsWith(".exe"));
-        if (exePath) {
-          setDroppedExePath(exePath);
-        }
+        if (exePath) setDroppedExePath(exePath);
       }
     });
-    return () => {
-      unlisten.then((f) => f());
-    };
+    return () => { unlisten.then((f) => f()); };
   }, []);
 
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.theme = config.settings.theme;
-    if (config.settings.accent_color) {
-      root.style.setProperty("--nexus-accent", config.settings.accent_color);
-    } else {
-      root.style.removeProperty("--nexus-accent");
-    }
+    if (config.settings.accent_color) root.style.setProperty("--nexus-accent", config.settings.accent_color);
+    else root.style.removeProperty("--nexus-accent");
     document.body.classList.toggle("reduce-motion", config.settings.reduce_animations);
   }, [config.settings]);
 
@@ -113,100 +117,46 @@ export default function App() {
     setView("game-detail");
   }
 
+  function completeProfile(next: UserProfile) {
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(next));
+    setProfile(next);
+  }
+
   useEffect(() => {
-    if (!config.settings.developer_mode && view === "files") {
-      setView("home");
-    }
+    if (!config.settings.developer_mode && view === "files") setView("home");
   }, [config.settings.developer_mode, view]);
 
   const selectedGame = config.games.find((g) => g.id === selectedGameId) ?? null;
 
   if (loading) {
-    return (
-      <div className="h-screen bg-nexus-bg flex items-center justify-center text-nexus-muted text-sm">
-        Chargement de Nyro...
-      </div>
-    );
+    return <div className="app-loading"><div className="app-loading-mark">O</div><span>Chargement d'Oryn...</span></div>;
   }
+
+  if (!profile) return <ProfileSetup onComplete={completeProfile} />;
 
   return (
     <div className="nyro-shell h-screen flex flex-col bg-nexus-bg text-nexus-text overflow-hidden">
       <UpdateChecker settings={config.settings} onSettingsChanged={refresh} />
       <div className="flex flex-1 min-h-0">
-      <Sidebar
-        current={view}
-        onNavigate={setView}
-        collapsed={collapsed}
-        onToggleCollapsed={() => setCollapsed((c) => !c)}
-        developerMode={config.settings.developer_mode}
-      />
-      <main className="flex-1 overflow-y-auto">
-        {view === "home" && (
-          <Dashboard
-            games={config.games}
-            onOpenGame={openGame}
-            onOpenTutorial={() => setTutorialOpen(true)}
-            onLaunchGame={async (id) => {
-              try {
-                await invoke("launch_game", { id });
-                notify("Jeu lancé", "success");
-              } catch (e) {
-                notify(`Erreur : ${e}`, "error");
-              }
-              await refresh();
-            }}
-            onGoToLibrary={() => setView("games")}
-          />
-        )}
-        {view === "games" && (
-          <GameLibrary games={config.games} onOpenGame={openGame} onGameAdded={refresh} />
-        )}
-        {view === "ranking" && <Ranking games={config.games} onOpenGame={openGame} />}
-        {view === "game-detail" && selectedGame && (
-          <GamePage
-            game={selectedGame}
-            onBack={() => setView("games")}
-            onLaunched={refresh}
-            developerMode={config.settings.developer_mode}
-            onRemoved={() => {
-              setView("games");
-              refresh();
-            }}
-          />
-        )}
-        {view === "files" && config.settings.developer_mode && (
-          <Files favorites={config.favorites} onFavoritesChanged={refresh} initialPath={targetFolder} />
-        )}
-        {view === "pc" && <SystemMonitor />}
-        {view === "settings" && <Settings settings={config.settings} onChanged={refresh} />}
-      </main>
+        <Sidebar current={view} onNavigate={setView} collapsed={collapsed} onToggleCollapsed={() => setCollapsed((c) => !c)} developerMode={config.settings.developer_mode} profile={profile} />
+        <main className="nyro-main flex-1 overflow-y-auto">
+          {view === "home" && <Dashboard games={config.games} onOpenGame={openGame} onOpenTutorial={() => setTutorialOpen(true)} profile={profile} onLaunchGame={async (id) => {
+            try { await invoke("launch_game", { id }); notify("Jeu lancé", "success"); }
+            catch (e) { notify(`Erreur : ${e}`, "error"); }
+            await refresh();
+          }} onGoToLibrary={() => setView("games")} />}
+          {view === "games" && <GameLibrary games={config.games} onOpenGame={openGame} onGameAdded={refresh} />}
+          {view === "ranking" && <Ranking games={config.games} onOpenGame={openGame} />}
+          {view === "game-detail" && selectedGame && <GamePage game={selectedGame} onBack={() => setView("games")} onLaunched={refresh} developerMode={config.settings.developer_mode} onRemoved={() => { setView("games"); refresh(); }} />}
+          {view === "files" && config.settings.developer_mode && <Files favorites={config.favorites} onFavoritesChanged={refresh} initialPath={targetFolder} />}
+          {view === "pc" && <SystemMonitor />}
+          {view === "settings" && <Settings settings={config.settings} onChanged={refresh} />}
+        </main>
       </div>
-      <GlobalSearch
-        onOpenGame={openGame}
-        onNavigateToFolder={(path) => {
-          setTargetFolder(path);
-          if (config.settings.developer_mode) {
-            setView("files");
-          }
-        }}
-      />
+      <GlobalSearch onOpenGame={openGame} onNavigateToFolder={(path) => { setTargetFolder(path); if (config.settings.developer_mode) setView("files"); }} />
       <Notifications />
-      <TutorialOverlay
-        open={tutorialOpen}
-        currentView={view}
-        onClose={() => setTutorialOpen(false)}
-        onNavigate={setView}
-      />
-      {droppedExePath && (
-        <AddGameModal
-          initialExePath={droppedExePath}
-          onClose={() => setDroppedExePath(null)}
-          onAdded={() => {
-            setDroppedExePath(null);
-            refresh();
-          }}
-        />
-      )}
+      <TutorialOverlay open={tutorialOpen} currentView={view} onClose={() => setTutorialOpen(false)} onNavigate={setView} />
+      {droppedExePath && <AddGameModal initialExePath={droppedExePath} onClose={() => setDroppedExePath(null)} onAdded={() => { setDroppedExePath(null); refresh(); }} />}
     </div>
   );
 }
