@@ -44,14 +44,14 @@ export default function ProfileSetup({ onComplete }: ProfileSetupProps) {
     <div className="profile-setup">
       <div className="profile-setup-glow" />
       <form className="profile-setup-card" onSubmit={submit}>
-        <div className="profile-setup-brand">ORYN</div>
+        <div className="profile-setup-brand">NYRO</div>
         <div className="profile-setup-step">PREMIER LANCEMENT · 01</div>
         <h1>Bienvenue.</h1>
         <p className="profile-setup-lead">Créons ton profil de joueur avant de commencer.</p>
 
-        <label className="profile-label" htmlFor="oryn-profile-name">Ton pseudo</label>
+        <label className="profile-label" htmlFor="nyro-profile-name">Ton pseudo</label>
         <input
-          id="oryn-profile-name"
+          id="nyro-profile-name"
           autoFocus
           value={name}
           onChange={(e) => setName(e.target.value)}
