@@ -1,4 +1,4 @@
-import { View } from "../types";
+import { View, Settings } from "../types";
 import SidebarIcon from "./SidebarIcon";
 import accueilIcon from "../../emojis/accueil.png";
 import jeuxIcon from "../../emojis/jeux.png";
@@ -14,6 +14,8 @@ interface SidebarProps {
   onToggleCollapsed: () => void;
   developerMode: boolean;
   profile: { name: string; avatar: string | null };
+  theme: Settings["theme"];
+  onToggleTheme: () => void;
 }
 
 const ITEMS: { view: View; icon: string; label: string; developerOnly?: boolean }[] = [
@@ -25,7 +27,7 @@ const ITEMS: { view: View; icon: string; label: string; developerOnly?: boolean 
   { view: "settings", icon: parametresIcon, label: "Paramètres" },
 ];
 
-export default function Sidebar({ current, onNavigate, collapsed, onToggleCollapsed, developerMode, profile }: SidebarProps) {
+export default function Sidebar({ current, onNavigate, collapsed, onToggleCollapsed, developerMode, profile, theme, onToggleTheme }: SidebarProps) {
   const avatarIsImage = profile.avatar?.startsWith("data:image/");
   return (
     <aside className={`nyro-sidebar h-screen shrink-0 flex flex-col transition-all duration-200 ${collapsed ? "w-20" : "w-[250px]"}`}>
@@ -42,7 +44,11 @@ export default function Sidebar({ current, onNavigate, collapsed, onToggleCollap
           </button>
         ))}
       </nav>
-      <div className="nyro-sidebar-bottom"><button title="Thème">◐</button><button title="Notifications">♧</button><button title="Quitter">⏻</button></div>
+      <div className="nyro-sidebar-bottom">
+        <button onClick={onToggleTheme} title={theme === "light" ? "Passer en mode sombre" : "Passer en mode clair"} aria-label={theme === "light" ? "Passer en mode sombre" : "Passer en mode clair"}>
+          {theme === "light" ? "☀" : "☾"}
+        </button>
+      </div>
     </aside>
   );
 }
