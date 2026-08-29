@@ -24,11 +24,11 @@ interface UserProfile {
   avatar: string | null;
 }
 
-const PROFILE_STORAGE_KEY = "oryn.user-profile";
+const PROFILE_STORAGE_KEY = "nyro.user-profile";
 
 function loadProfile(): UserProfile | null {
   try {
-    const raw = localStorage.getItem(PROFILE_STORAGE_KEY);
+    const raw = localStorage.getItem(PROFILE_STORAGE_KEY) || localStorage.getItem("oryn.user-profile");
     if (!raw) return null;
     const profile = JSON.parse(raw) as UserProfile;
     return profile?.name?.trim() ? profile : null;
@@ -42,20 +42,11 @@ export default function App() {
   const [collapsed, setCollapsed] = useState(false);
   const [profile, setProfile] = useState<UserProfile | null>(loadProfile);
   const [config, setConfig] = useState<AppConfig>({
-    games: [],
-    favorites: [],
+    games: [], favorites: [],
     settings: {
-      theme: "dark",
-      accent_color: null,
-      reduce_animations: false,
-      developer_mode: false,
-      steamgriddb_api_key: null,
-      steam_api_key: null,
-      steam_id64: null,
-      youtube_api_key: null,
-      igdb_client_id: null,
-      igdb_client_secret: null,
-      ignored_update_version: null,
+      theme: "dark", accent_color: null, reduce_animations: false, developer_mode: false,
+      steamgriddb_api_key: null, steam_api_key: null, steam_id64: null, youtube_api_key: null,
+      igdb_client_id: null, igdb_client_secret: null, ignored_update_version: null,
     },
   });
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null);
@@ -69,9 +60,7 @@ export default function App() {
     setConfig(cfg);
   }
 
-  useEffect(() => {
-    refresh().finally(() => setLoading(false));
-  }, []);
+  useEffect(() => { refresh().finally(() => setLoading(false)); }, []);
 
   useEffect(() => {
     type PendingAction = { type: "AddGame" | "OpenFolder"; path: string } | null;
@@ -112,10 +101,17 @@ export default function App() {
     document.body.classList.toggle("reduce-motion", config.settings.reduce_animations);
   }, [config.settings]);
 
-  function openGame(id: string) {
-    setSelectedGameId(id);
-    setView("game-detail");
+  async function toggleTheme() {
+    const next = config.settings.theme === "light" ? "dark" : "light";
+    try {
+      await invoke("update_settings", { settings: { ...config.settings, theme: next } });
+      await refresh();
+    } catch (e) {
+      notify(`Erreur : ${e}`, "error");
+    }
   }
+
+  function openGame(id: string) { setSelectedGameId(id); setView("game-detail"); }
 
   function completeProfile(next: UserProfile) {
     localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(next));
@@ -128,17 +124,14 @@ export default function App() {
 
   const selectedGame = config.games.find((g) => g.id === selectedGameId) ?? null;
 
-  if (loading) {
-    return <div className="app-loading"><div className="app-loading-mark">O</div><span>Chargement d'Oryn...</span></div>;
-  }
-
+  if (loading) return <div className="app-loading"><div className="app-loading-mark">N</div><span>Chargement de Nyro...</span></div>;
   if (!profile) return <ProfileSetup onComplete={completeProfile} />;
 
   return (
     <div className="nyro-shell h-screen flex flex-col bg-nexus-bg text-nexus-text overflow-hidden">
       <UpdateChecker settings={config.settings} onSettingsChanged={refresh} />
       <div className="flex flex-1 min-h-0">
-        <Sidebar current={view} onNavigate={setView} collapsed={collapsed} onToggleCollapsed={() => setCollapsed((c) => !c)} developerMode={config.settings.developer_mode} profile={profile} />
+        <Sidebar current={view} onNavigate={setView} collapsed={collapsed} onToggleCollapsed={() => setCollapsed((c) => !c)} developerMode={config.settings.developer_mode} profile={profile} theme={config.settings.theme} onToggleTheme={toggleTheme} />
         <main className="nyro-main flex-1 overflow-y-auto">
           {view === "home" && <Dashboard games={config.games} onOpenGame={openGame} onOpenTutorial={() => setTutorialOpen(true)} profile={profile} onLaunchGame={async (id) => {
             try { await invoke("launch_game", { id }); notify("Jeu lancé", "success"); }
