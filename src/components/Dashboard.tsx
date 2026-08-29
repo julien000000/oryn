@@ -31,6 +31,10 @@ export default function Dashboard({ games, onOpenGame, onLaunchGame, onGoToLibra
   const lastPlayed = recent.slice(0, 8);
   const avatarIsImage = profile.avatar?.startsWith("data:image/");
 
+  function openSearch() {
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: " ", code: "Space", ctrlKey: true }));
+  }
+
   return (
     <div className="xbox-home page-enter">
       <div className="xbox-backdrop" style={focusedGame?.cover_image ? { backgroundImage: `url(${focusedGame.cover_image})` } : undefined} />
@@ -41,13 +45,12 @@ export default function Dashboard({ games, onOpenGame, onLaunchGame, onGoToLibra
           <div className="xbox-avatar">{avatarIsImage ? <img src={profile.avatar!} alt="" /> : <span>{profile.avatar || profile.name.charAt(0).toUpperCase()}</span>}</div>
           <div><div className="xbox-gamertag">{profile.name}</div><div className="xbox-status"><span /> EN LIGNE</div></div>
         </div>
-        <nav className="xbox-quick-nav" aria-label="Navigation rapide">
-          <button onClick={onGoToLibrary} title="Ma bibliothèque">▦</button>
-          <button onClick={onGoToLibrary} title="Jeux">⌁</button>
-          <button onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: " ", code: "Space", ctrlKey: true }))} title="Recherche">⌕</button>
-          <button onClick={onOpenTutorial} title="Aide">?</button>
-        </nav>
-        <div className="xbox-clock"><span>ORYN</span><strong>{new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date())}</strong></div>
+        <button className="nyro-home-search" onClick={openSearch} aria-label="Rechercher un jeu">
+          <span className="nyro-search-icon">⌕</span>
+          <span>Rechercher un jeu...</span>
+          <kbd>Ctrl + Espace</kbd>
+        </button>
+        <div className="xbox-clock"><span>NYRO</span><strong>{new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(new Date())}</strong></div>
       </header>
 
       <div className="xbox-content">
@@ -62,7 +65,7 @@ export default function Dashboard({ games, onOpenGame, onLaunchGame, onGoToLibra
             </div>
           </section>
         ) : (
-          <section className="xbox-empty-featured"><div><p className="xbox-kicker">BIENVENUE SUR ORYN</p><h1>Ton espace gaming.</h1><p>Ajoute tes jeux pour construire ton accueil.</p><button className="xbox-play" onClick={onGoToLibrary}>AJOUTER DES JEUX</button></div></section>
+          <section className="xbox-empty-featured"><div><p className="xbox-kicker">BIENVENUE SUR NYRO</p><h1>Ton espace gaming.</h1><p>Ajoute tes jeux pour construire ton accueil.</p><button className="xbox-play" onClick={onGoToLibrary}>AJOUTER DES JEUX</button></div></section>
         )}
 
         <section className="xbox-section"><div className="xbox-section-heading"><div><p className="xbox-kicker">RÉCEMMENT JOUÉS</p><h2>Ta collection</h2></div><button onClick={onGoToLibrary}>VOIR TOUT →</button></div>
@@ -73,7 +76,7 @@ export default function Dashboard({ games, onOpenGame, onLaunchGame, onGoToLibra
           <div className="xbox-feature-grid">
             <button className="xbox-feature-card xbox-feature-library" onClick={onGoToLibrary}><div><span className="xbox-card-icon">▦</span><p>PARCOURIR</p><strong>Bibliothèque</strong></div></button>
             <button className="xbox-feature-card xbox-feature-recent" onClick={() => focusedGame && onOpenGame(focusedGame.id)}><div><span className="xbox-card-icon">◷</span><p>REPRENDRE</p><strong>{lastPlayed[0]?.name ?? "Ton prochain jeu"}</strong></div></button>
-            <button className="xbox-feature-card xbox-feature-tutorial" onClick={onOpenTutorial}><div className="xbox-tutorial-card-content"><SidebarIcon src={lapinTuto} alt="" removeGreenScreen className="w-14 h-14 object-contain" /><div><p>ORYN</p><strong>Personnaliser</strong></div></div></button>
+            <button className="xbox-feature-card xbox-feature-tutorial" onClick={onOpenTutorial}><div className="xbox-tutorial-card-content"><SidebarIcon src={lapinTuto} alt="" removeGreenScreen className="w-14 h-14 object-contain" /><div><p>NYRO</p><strong>Personnaliser</strong></div></div></button>
           </div>
         </section>
       </div>
