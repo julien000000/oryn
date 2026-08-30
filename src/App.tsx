@@ -18,6 +18,7 @@ import TutorialOverlay from "./components/TutorialOverlay";
 import ProfileSetup from "./components/ProfileSetup";
 import { notify } from "./notify";
 import { AppConfig, View } from "./types";
+import { explosionGif } from "./assets/explosionGif";
 
 interface UserProfile {
   name: string;
@@ -189,7 +190,7 @@ export default function App() {
       </div>
       <GlobalSearch onOpenGame={openGame} onNavigateToFolder={(path) => { setTargetFolder(path); if (config.settings.developer_mode) setView("files"); }} />
       <Notifications />
-      {chaosMode && <div className="nyro-chaos-overlay" aria-hidden="true">{Array.from({ length: 18 }, (_, i) => <img key={i} className={`nyro-chaos-gif nyro-chaos-gif-${i + 1}`} src="/assets/explosion.gif" alt="" />)}</div>}
+      {chaosMode && <div className="nyro-chaos-overlay" aria-hidden="true">{Array.from({ length: 18 }, (_, i) => <img key={i} className={`nyro-chaos-gif nyro-chaos-gif-${i + 1}`} src={explosionGif} alt="" />)}</div>}
       <TutorialOverlay open={tutorialOpen} currentView={view} onClose={() => setTutorialOpen(false)} onNavigate={setView} />
       {droppedExePath && <AddGameModal initialExePath={droppedExePath} onClose={() => setDroppedExePath(null)} onAdded={() => { setDroppedExePath(null); refresh(); }} />}
     </div>
