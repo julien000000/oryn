@@ -54,6 +54,7 @@ export default function App() {
   const [droppedExePath, setDroppedExePath] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [tutorialOpen, setTutorialOpen] = useState(false);
+  const [chaosMode, setChaosMode] = useState(false);
 
   async function refresh() {
     const cfg = await invoke<AppConfig>("get_config");
@@ -113,6 +114,11 @@ export default function App() {
 
   function openGame(id: string) { setSelectedGameId(id); setView("game-detail"); }
 
+  function triggerChaos() {
+    setChaosMode(true);
+    window.setTimeout(() => setChaosMode(false), 4200);
+  }
+
   function completeProfile(next: UserProfile) {
     localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(next));
     setProfile(next);
@@ -128,10 +134,10 @@ export default function App() {
   if (!profile) return <ProfileSetup onComplete={completeProfile} />;
 
   return (
-    <div className="nyro-shell h-screen flex flex-col bg-nexus-bg text-nexus-text overflow-hidden">
+    <div className={`nyro-shell h-screen flex flex-col bg-nexus-bg text-nexus-text overflow-hidden ${chaosMode ? "nyro-chaos" : ""}`}>
       <UpdateChecker settings={config.settings} onSettingsChanged={refresh} />
       <div className="flex flex-1 min-h-0">
-        <Sidebar current={view} onNavigate={setView} collapsed={collapsed} onToggleCollapsed={() => setCollapsed((c) => !c)} developerMode={config.settings.developer_mode} profile={profile} theme={config.settings.theme} onToggleTheme={toggleTheme} />
+        <Sidebar current={view} onNavigate={setView} collapsed={collapsed} onToggleCollapsed={() => setCollapsed((c) => !c)} developerMode={config.settings.developer_mode} profile={profile} theme={config.settings.theme} onToggleTheme={toggleTheme} onChaos={triggerChaos} />
         <main className="nyro-main flex-1 overflow-y-auto">
           {view === "home" && <Dashboard games={config.games} onOpenGame={openGame} onOpenTutorial={() => setTutorialOpen(true)} profile={profile} onLaunchGame={async (id) => {
             try { await invoke("launch_game", { id }); notify("Jeu lancé", "success"); }
@@ -148,6 +154,7 @@ export default function App() {
       </div>
       <GlobalSearch onOpenGame={openGame} onNavigateToFolder={(path) => { setTargetFolder(path); if (config.settings.developer_mode) setView("files"); }} />
       <Notifications />
+      {chaosMode && <div className="nyro-chaos-overlay" aria-hidden="true"><div className="nyro-chaos-word">NYRO</div><i /><i /><i /><i /><i /><span>CHAOS MODE</span></div>}
       <TutorialOverlay open={tutorialOpen} currentView={view} onClose={() => setTutorialOpen(false)} onNavigate={setView} />
       {droppedExePath && <AddGameModal initialExePath={droppedExePath} onClose={() => setDroppedExePath(null)} onAdded={() => { setDroppedExePath(null); refresh(); }} />}
     </div>
