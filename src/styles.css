@@ -69,10 +69,10 @@ input,select,textarea { color:var(--nexus-text); }
 .reduce-motion .page-enter { animation:none; }
 
 /* NYRO HOME: artwork is the visual focus. No gradients. */
-.xbox-home{position:relative;min-height:100%;overflow:hidden;isolation:isolate;background:#071018;color:#eef4fb}
+.xbox-home{position:relative;min-height:100%;overflow:hidden;isolation:isolate;background:#05080d;color:#eef4fb}
 .xbox-backdrop,.xbox-backdrop-overlay{position:fixed;inset:0;pointer-events:none}
-.xbox-backdrop{z-index:-3;background-position:center;background-size:cover;background-repeat:no-repeat;filter:blur(3px) saturate(1.08);opacity:.82;transform:scale(1.035);transition:opacity .25s ease,filter .25s ease,background-image .35s ease}
-.xbox-backdrop-overlay{z-index:-2;background:rgba(3,7,12,.46)}
+.xbox-backdrop{z-index:-3;background-position:center;background-size:cover;background-repeat:no-repeat;filter:brightness(.42) contrast(1.28) saturate(1.12);opacity:1;transform:scale(1.02);transition:filter .25s ease,background-image .35s ease}
+.xbox-backdrop-overlay{z-index:-2;background:rgba(2,5,9,.48)}
 .xbox-topbar{height:88px;padding:18px 52px;display:grid;grid-template-columns:1fr minmax(280px,620px) 1fr;align-items:center;gap:24px;position:relative;z-index:2}
 .xbox-profile{display:flex;align-items:center;gap:12px}
 .xbox-avatar{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:18px;background:#2558bf;overflow:hidden;box-shadow:0 0 0 2px rgba(255,255,255,.2),0 8px 28px rgba(0,0,0,.35)}
@@ -88,3 +88,23 @@ input,select,textarea { color:var(--nexus-text); }
 /* Hide the old storage-path card in Settings. */
 .max-w-3xl > .nyro-panel:last-child{display:none}
 @media(max-width:900px){.xbox-topbar{padding:14px 24px;grid-template-columns:1fr auto}.nyro-home-search{grid-column:1/-1;grid-row:2}.xbox-clock{display:none}.xbox-content{padding:12px 24px 36px}.xbox-game-row{grid-template-columns:repeat(auto-fit,minmax(104px,1fr))}}
+
+
+/* Easter egg: controlled visual chaos, no gradients. */
+@keyframes nyro-chaos-shake{0%,100%{transform:translate(0,0) rotate(0)}12%{transform:translate(-10px,5px) rotate(-.5deg)}24%{transform:translate(12px,-7px) rotate(.6deg)}36%{transform:translate(-7px,9px) rotate(-.4deg)}48%{transform:translate(8px,3px) rotate(.35deg)}60%{transform:translate(-4px,-8px) rotate(-.2deg)}}
+@keyframes nyro-chaos-flash{0%,100%{opacity:0}8%,20%,32%,44%,56%,68%{opacity:.2}}
+@keyframes nyro-chaos-word{0%{opacity:0;transform:scale(.6) rotate(-8deg)}16%{opacity:1;transform:scale(1.18) rotate(4deg)}32%{transform:scale(.94) rotate(-2deg)}100%{opacity:0;transform:scale(1.55) rotate(8deg)}}
+@keyframes nyro-chaos-shard{0%{transform:translate(0,0) rotate(0);opacity:0}12%{opacity:.85}100%{transform:translate(var(--x),var(--y)) rotate(540deg);opacity:0}}
+.nyro-chaos .nyro-sidebar,.nyro-chaos .nyro-main{animation:nyro-chaos-shake .14s linear infinite;will-change:transform}
+.nyro-chaos .xbox-game-tile{animation:nyro-chaos-shake .19s linear infinite}
+.nyro-chaos .xbox-backdrop{filter:brightness(.32) contrast(1.55) saturate(1.7);transform:scale(1.08)}
+.nyro-chaos-overlay{position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;background:rgba(18,0,35,.06);animation:nyro-chaos-flash .32s steps(2) infinite}
+.nyro-chaos-word{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);font-size:clamp(70px,16vw,260px);font-weight:950;letter-spacing:.14em;color:#fff;text-shadow:10px 0 #6d35ff,-10px 0 #00d9ff;animation:nyro-chaos-word 1.2s steps(5) infinite}
+.nyro-chaos-overlay span{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);font-size:12px;font-weight:900;letter-spacing:.55em;color:#fff;background:#6d35ff;padding:10px 18px;box-shadow:0 0 24px rgba(109,53,255,.9)}
+.nyro-chaos-overlay i{position:absolute;width:12px;height:12px;background:#fff;box-shadow:0 0 28px currentColor;animation:nyro-chaos-shard 1.4s linear infinite}
+.nyro-chaos-overlay i:nth-of-type(1){left:50%;top:50%;--x:-45vw;--y:-38vh;color:#6d35ff}
+.nyro-chaos-overlay i:nth-of-type(2){left:50%;top:50%;--x:43vw;--y:-31vh;color:#00d9ff;animation-delay:.18s}
+.nyro-chaos-overlay i:nth-of-type(3){left:50%;top:50%;--x:-38vw;--y:39vh;color:#ff3b6b;animation-delay:.36s}
+.nyro-chaos-overlay i:nth-of-type(4){left:50%;top:50%;--x:40vw;--y:34vh;color:#f5d547;animation-delay:.54s}
+.nyro-chaos-overlay i:nth-of-type(5){left:50%;top:50%;--x:0vw;--y:-46vh;color:#45f0a3;animation-delay:.72s}
+.reduce-motion .nyro-chaos .nyro-sidebar,.reduce-motion .nyro-chaos .nyro-main,.reduce-motion .nyro-chaos .xbox-game-tile,.reduce-motion .nyro-chaos-overlay,.reduce-motion .nyro-chaos-word,.reduce-motion .nyro-chaos-overlay i{animation:none}
