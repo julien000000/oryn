@@ -123,7 +123,6 @@ export default function App() {
     if (!chaosMode) return;
     const root = document.querySelector(".nyro-shell");
     if (!root) return;
-    const originals = new Map<Text, string>();
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     const nodes: Text[] = [];
     let node: Node | null;
@@ -135,18 +134,20 @@ export default function App() {
     }
     nodes.forEach((textNode) => {
       const text = textNode.textContent || "";
-      originals.set(textNode, text);
       const fragment = document.createDocumentFragment();
       [...text].forEach((character, index) => {
-        if (/\\s/.test(character)) { fragment.appendChild(document.createTextNode(character)); return; }
+        if (/\s/.test(character)) {
+          fragment.appendChild(document.createTextNode(character));
+          return;
+        }
         const span = document.createElement("span");
         span.className = "nyro-letter-drop";
         span.textContent = character;
         span.style.setProperty("--nyro-delay", `${Math.min(1.4, Math.random() * 1.15 + index * 0.012)}s`);
         span.style.setProperty("--nyro-drift", `${Math.round((Math.random() - .5) * 260)}px`);
-        textNode.parentNode?.replaceChild(fragment, textNode);
         fragment.appendChild(span);
       });
+      textNode.parentNode?.replaceChild(fragment, textNode);
     });
     return () => {
       document.querySelectorAll<HTMLElement>(".nyro-letter-drop").forEach((span) => span.replaceWith(document.createTextNode(span.textContent || "")));
