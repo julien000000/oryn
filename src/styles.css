@@ -108,3 +108,52 @@ input,select,textarea { color:var(--nexus-text); }
 .nyro-chaos-overlay i:nth-of-type(4){left:50%;top:50%;--x:40vw;--y:34vh;color:#f5d547;animation-delay:.54s}
 .nyro-chaos-overlay i:nth-of-type(5){left:50%;top:50%;--x:0vw;--y:-46vh;color:#45f0a3;animation-delay:.72s}
 .reduce-motion .nyro-chaos .nyro-sidebar,.reduce-motion .nyro-chaos .nyro-main,.reduce-motion .nyro-chaos .xbox-game-tile,.reduce-motion .nyro-chaos-overlay,.reduce-motion .nyro-chaos-word,.reduce-motion .nyro-chaos-overlay i{animation:none}
+
+
+/* Easter egg v2: use the local Nyro explosion GIF, never show a text label. */
+@keyframes nyro-letter-fall{
+  0%{transform:translate3d(0,0,0) rotate(0deg);opacity:1}
+  100%{transform:translate3d(var(--nyro-drift),115vh,0) rotate(720deg);opacity:0}
+}
+.nyro-letter-drop{
+  display:inline-block;
+  will-change:transform,opacity;
+  animation:nyro-letter-fall 1.9s cubic-bezier(.18,.72,.24,1) var(--nyro-delay) forwards;
+}
+.nyro-chaos-word,.nyro-chaos-overlay span,.nyro-chaos-overlay i{display:none}
+.nyro-chaos-overlay{
+  background:transparent;
+  animation:none;
+  mix-blend-mode:normal;
+}
+.nyro-chaos-gif{
+  position:absolute;
+  width:clamp(90px,14vw,240px);
+  height:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 0 18px rgba(255,255,255,.24));
+  animation:nyro-chaos-gif-pop .62s steps(2) infinite alternate;
+}
+@keyframes nyro-chaos-gif-pop{
+  from{opacity:.72;transform:scale(.82) rotate(var(--r))}
+  to{opacity:1;transform:scale(1.08) rotate(var(--r))}
+}
+.nyro-chaos-gif-1{left:2%;top:3%;--r:-28deg}
+.nyro-chaos-gif-2{left:18%;top:8%;--r:16deg}
+.nyro-chaos-gif-3{left:37%;top:2%;--r:48deg}
+.nyro-chaos-gif-4{left:59%;top:10%;--r:-17deg}
+.nyro-chaos-gif-5{right:3%;top:2%;--r:30deg}
+.nyro-chaos-gif-6{left:4%;top:30%;--r:62deg}
+.nyro-chaos-gif-7{left:23%;top:35%;--r:-42deg}
+.nyro-chaos-gif-8{left:44%;top:28%;--r:12deg}
+.nyro-chaos-gif-9{left:67%;top:33%;--r:-58deg}
+.nyro-chaos-gif-10{right:1%;top:31%;--r:24deg}
+.nyro-chaos-gif-11{left:1%;bottom:5%;--r:-12deg}
+.nyro-chaos-gif-12{left:17%;bottom:12%;--r:37deg}
+.nyro-chaos-gif-13{left:34%;bottom:3%;--r:-68deg}
+.nyro-chaos-gif-14{left:51%;bottom:13%;--r:20deg}
+.nyro-chaos-gif-15{left:68%;bottom:4%;--r:-31deg}
+.nyro-chaos-gif-16{right:2%;bottom:12%;--r:55deg}
+.nyro-chaos-gif-17{left:78%;top:18%;--r:-76deg}
+.nyro-chaos-gif-18{left:49%;top:51%;--r:82deg}
+.reduce-motion .nyro-letter-drop,.reduce-motion .nyro-chaos-gif{animation:none}
