@@ -119,6 +119,40 @@ export default function App() {
     window.setTimeout(() => setChaosMode(false), 4200);
   }
 
+  useEffect(() => {
+    if (!chaosMode) return;
+    const root = document.querySelector(".nyro-shell");
+    if (!root) return;
+    const originals = new Map<Text, string>();
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes: Text[] = [];
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+      const text = node.textContent || "";
+      const parent = node.parentElement;
+      if (!parent || parent.closest(".nyro-chaos-overlay") || !text.trim()) continue;
+      nodes.push(node as Text);
+    }
+    nodes.forEach((textNode) => {
+      const text = textNode.textContent || "";
+      originals.set(textNode, text);
+      const fragment = document.createDocumentFragment();
+      [...text].forEach((character, index) => {
+        if (/\\s/.test(character)) { fragment.appendChild(document.createTextNode(character)); return; }
+        const span = document.createElement("span");
+        span.className = "nyro-letter-drop";
+        span.textContent = character;
+        span.style.setProperty("--nyro-delay", `${Math.min(1.4, Math.random() * 1.15 + index * 0.012)}s`);
+        span.style.setProperty("--nyro-drift", `${Math.round((Math.random() - .5) * 260)}px`);
+        textNode.parentNode?.replaceChild(fragment, textNode);
+        fragment.appendChild(span);
+      });
+    });
+    return () => {
+      document.querySelectorAll<HTMLElement>(".nyro-letter-drop").forEach((span) => span.replaceWith(document.createTextNode(span.textContent || "")));
+    };
+  }, [chaosMode]);
+
   function completeProfile(next: UserProfile) {
     localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(next));
     setProfile(next);
@@ -154,7 +188,7 @@ export default function App() {
       </div>
       <GlobalSearch onOpenGame={openGame} onNavigateToFolder={(path) => { setTargetFolder(path); if (config.settings.developer_mode) setView("files"); }} />
       <Notifications />
-      {chaosMode && <div className="nyro-chaos-overlay" aria-hidden="true"><div className="nyro-chaos-word">NYRO</div><i /><i /><i /><i /><i /><span>CHAOS MODE</span></div>}
+      {chaosMode && <div className="nyro-chaos-overlay" aria-hidden="true">{Array.from({ length: 18 }, (_, i) => <img key={i} className={`nyro-chaos-gif nyro-chaos-gif-${i + 1}`} src="/assets/explosion.gif" alt="" />)}</div>}
       <TutorialOverlay open={tutorialOpen} currentView={view} onClose={() => setTutorialOpen(false)} onNavigate={setView} />
       {droppedExePath && <AddGameModal initialExePath={droppedExePath} onClose={() => setDroppedExePath(null)} onAdded={() => { setDroppedExePath(null); refresh(); }} />}
     </div>
