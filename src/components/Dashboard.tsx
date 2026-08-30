@@ -33,9 +33,9 @@ export default function Dashboard({ games, onOpenGame, onLaunchGame, onGoToLibra
   }
 
   return (
-    <div className="xbox-home page-enter">
-      <div className="xbox-backdrop" style={focusedGame?.cover_image ? { backgroundImage: `url(${focusedGame.cover_image})` } : undefined} />
-      <div className="xbox-backdrop-overlay" />
+    <div className="xbox-home page-enter" style={{ backgroundColor: "#030609" }}>
+      <div className="xbox-backdrop" style={focusedGame?.cover_image ? { backgroundImage: `url(${focusedGame.cover_image})`, backgroundColor: "#030609", filter: "brightness(.22) contrast(1.35) saturate(1.08)" } : { backgroundColor: "#030609" }} />
+      <div className="xbox-backdrop-overlay" style={{ backgroundColor: "rgba(1,3,7,.86)" }} />
 
       <header className="xbox-topbar">
         <div className="xbox-profile">
